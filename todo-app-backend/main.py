@@ -1,10 +1,37 @@
+from contextlib import asynccontextmanager
+import math
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from uuid import uuid4
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
 
-app = FastAPI()
+DATABASE_URL = "postgresql+psycopg://postgres:admin@127.0.0.1:5432/postgres"
+
+engine = create_engine(DATABASE_URL)
+
+Sessionlocal = sessionmaker[Session](bind=engine)
+
+
+
+class Base(DeclarativeBase):
+    id: Mapped[str] = mapped_column(primary_key=True, default=uuid4)
+
+
+class TaskORM(Base):
+    __tablename__ = "tasks"
+    title: Mapped[str]
+    completed: Mapped[bool] = mapped_column(default=False)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 
 app.add_middleware(
@@ -28,6 +55,14 @@ class TaskCreate(BaseModel):
 
 tasks: list[TaskSchema] = []
 
+
+def get_db():
+    db = Sessionlocal()
+    
+    yield
+     
+    db.close()
+
 @app.get("/")
 def read_base_page():
     return {"message" : "Hello world!"}
@@ -43,7 +78,7 @@ def create_task(payload: TaskCreate) -> TaskSchema:
     tasks.append(new_task)
     return new_task
 
-
+  
 @app.patch("/tasks/{task_id}")
 def update_task(
     task_id: str,
