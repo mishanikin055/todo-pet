@@ -1,0 +1,37 @@
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+from app.repositories.task import TaskRepository
+from app.schemas.task import TaskSchema, TaskUpdateSchema, TaskCreateSchema
+
+class TaskService:
+    def __init__(self, db: Session) -> None:
+        self.db = db
+        self.task_repository = TaskRepository(db)
+    
+    
+    def list_tasks(self) -> list[TaskSchema]:
+        tasks = self.task_repository.get_all()
+        return [TaskSchema.model_validate(task) for task in tasks]
+        
+    def create_task(self, task_create: TaskCreateSchema) -> TaskSchema:
+        task_orm = self.task_repository.create_task(task_create.title)
+        self.db.commit()
+        return TaskSchema.model_validate(task_orm)
+        
+        
+    def update_task(self, task_id: str, task_update: TaskUpdateSchema) -> TaskSchema:
+        task_for_update = self.task_repository.get_by_id(task_id)
+        # if task_for_update is None:
+        #     raise HTTPException(status_code=404, detail="Задача не найдена")
+        if task_for_update.completed is not None:
+            task_update.completed = task_update.completed
+        if task_update.title is not None:
+            task_for_update.title = task_update.title
+            
+        self.db.commit
+        return TaskSchema.model_validate(task_for_update)
+    
+    
+    def delete_task(self, task_id: str) -> None:
+        self.task_repository.delete(task_id)
+        self.db.commit()
