@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.task import TaskORM
@@ -20,6 +20,5 @@ class TaskRepository:
         self.db.add(new_task)
         return new_task
         
-    def delete(self, id: str) -> None:
-        stmt = delete(TaskORM).where(TaskORM.id == id)
-        self.db.execute(stmt)
+    def delete(self, task: TaskORM) -> None:
+        self.db.delete(task)

@@ -5,5 +5,5 @@ from app.db.database import get_db
 from app.services.task import TaskService
 
 
-def get_task_service(db: Session = Depends(get_db())):
+def get_task_service(db: Session = Depends(get_db)):
     return TaskService(db)

@@ -10,8 +10,6 @@ engine = create_engine(settings.DATABASE_URL)
 Sessionlocal = sessionmaker[Session](bind=engine)
 
 
-
-
 def init_db():
     Base.metadata.create_all(bind=engine)
         

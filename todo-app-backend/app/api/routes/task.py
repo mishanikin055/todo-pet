@@ -1,13 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 from app.api.dependencies import get_task_service
 from app.schemas.task import TaskCreateSchema, TaskSchema, TaskUpdateSchema
-from app.services.task import TaskService
+from app.services.task import TaskNotFound, TaskService
 
 router = APIRouter(prefix="/tasks")
-
-
-
 
 @router.get("")
 def read_tasks(task_service: TaskService = Depends(get_task_service)) -> list[TaskSchema]:
@@ -19,8 +16,17 @@ def create_task(payload: TaskCreateSchema, task_service: TaskService = Depends(g
   
 @router.patch("/{task_id}")
 def update_task(task_id: str, payload: TaskUpdateSchema, task_service: TaskService = Depends(get_task_service)) -> TaskSchema:
-    return task_service.update_task(task_id, payload)
-
+    try:
+        return task_service.update_task(task_id, payload)
+    except TaskNotFound:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+    
+    
+    
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: str, task_service: TaskService = Depends(get_task_service)):
-    return task_service.delete_task(task_id)
+    try:
+         return task_service.delete_task(task_id)
+    except TaskNotFound:
+        raise HTTPException(status_code=404, detail="Задача не найдена")
+    
