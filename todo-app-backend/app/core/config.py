@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -8,6 +9,9 @@ class Settings:
     
 def get_settings() -> Settings:
     return Settings(
-        "postgresql+psycopg://postgres:admin@127.0.0.1:5432/postgres",
-        ["http://localhost:3000"]
+        os.getenv("DATAASE_URL"),
+        cors_raw = os.getenv("CORS_ORIGINS")
+        cors_list = cors_raw.split(",")
+
+        return Settings(DATABASE_URL=db_url, cors_allowed_origin=cors_list)
     )
