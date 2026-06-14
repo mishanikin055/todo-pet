@@ -2,6 +2,7 @@ services:
   backend:
     build: ./todo-app-backend
     container_name: backend
+    restart: always
     env_file:
       - .env
     depends_on:
