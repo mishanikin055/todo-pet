@@ -1,0 +1,14 @@
+services:
+  backend:
+    restart: always
+
+  db:
+    restart: always
+
+  frontend:
+    restart: always
+
+  proxy:
+    restart: always
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro

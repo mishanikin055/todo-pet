@@ -5,7 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
-
+nginx.dev.conf
+docker-compose.override.yml
 # Distribution / packaging
 .Python
 build/

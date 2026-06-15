@@ -9,7 +9,11 @@ async def lifespan(app: FastAPI):
     init_db()
     yield
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    root_path="/api"
+    )
+
 app.include_router(task_router)
 
 app.add_middleware(
