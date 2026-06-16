@@ -10,7 +10,7 @@ class TaskRepository:
     
     
     def get_all(self) -> list[TaskORM]:
-        return self.db.scalars(select(TaskORM)).all()
+        return self.db.scalars(select(TaskORM).order_by(TaskORM.created_at)).all()
     
     def get_by_id(self, id: str) -> TaskORM:
         return self.db.get(TaskORM, id)
