@@ -10,7 +10,8 @@ class TaskNotFound(Exception):
 
 class TaskService:
     def __init__(self,
-        db: Session, cache_redis_url: str,
+        db: Session,
+        cache_redis_url: str,
         cache_ttl_seconds: int,
         cache_tasks_key: str
     ) -> None:
@@ -20,7 +21,7 @@ class TaskService:
         self.cache_tasks_key = cache_tasks_key
     
     def list_tasks(self) -> list[TaskSchema]:
-        cached_tasks = self.cache.get(self.cache_tasks_key):
+        cached_tasks = self.cache.get(self.cache_tasks_key)
         if cached_tasks:
             return cached_tasks
         
