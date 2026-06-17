@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.repositories.task import TaskRepository
+from app.cache.redis import RedisCacheBackend
 from app.schemas.task import TaskSchema, TaskUpdateSchema, TaskCreateSchema
 
 class TaskNotFound(Exception):
@@ -8,12 +9,21 @@ class TaskNotFound(Exception):
     ...
 
 class TaskService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self,
+        db: Session, cache_redis_url: str,
+        cache_ttl_seconds: int,
+        cache_tasks_key: str
+    ) -> None:
         self.db = db
         self.task_repository = TaskRepository(db)
-    
+        self.cache = RedisCacheBackend(cache_redis_url, cache_ttl_seconds)
+        self.cache_tasks_key = cache_tasks_key
     
     def list_tasks(self) -> list[TaskSchema]:
+        cached_tasks = self.cache.get(self.cache_tasks_key):
+        if cached_tasks:
+            return cached_tasks
+        
         tasks = self.task_repository.get_all()
         return [TaskSchema.model_validate(task) for task in tasks]
         
