@@ -5,7 +5,7 @@ from app.models.base import Base
 
 settings = get_settings()
 
-engine = create_engine(settings.DATABASE_URL)
+engine = create_engine(settings.DATABASE_URL, echo=True)
 
 Sessionlocal = sessionmaker[Session](bind=engine)
 

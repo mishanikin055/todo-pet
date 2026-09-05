@@ -30,6 +30,10 @@ services:
     depends_on:
       - frontend
       - backend
-
+  redis:
+    image: redis:alpine
+    container_name: project_redis # опционально
+    
+  
 volumes:
   pg_data:
