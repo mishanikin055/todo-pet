@@ -1,10 +1,9 @@
-from pydantic import BaseModel, ConfigDict
-from datetime import datetime
+from uuid import UUID
 
-
+from pydantic import BaseModel
 
 class CategorySchema(BaseModel):
-    id: str
+    id: UUID
     name: str
 
 
